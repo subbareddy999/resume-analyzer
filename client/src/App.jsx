@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 import './App.css';
 import AnalysisPage from './components/AnalysisPage';
 import HistoryPage from './components/HistoryPage';
@@ -8,6 +9,7 @@ function App() {
 
   return (
     <div className="app">
+      <Toaster position="top-center" reverseOrder={false} />
       <nav className="tabs">
         <button
           className={activeTab === 'live' ? 'active' : ''}

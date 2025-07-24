@@ -10,7 +10,6 @@ const HistoryPage = () => {
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch the list of all analyses when the component mounts
   useEffect(() => {
     const fetchAnalyses = async () => {
       try {
@@ -27,10 +26,8 @@ const HistoryPage = () => {
     fetchAnalyses();
   }, []);
 
-  // Handle clicking the "Details" button
   const handleDetailsClick = async (id) => {
     try {
-      // --- CORRECTED LINE ---
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/analyses/${id}`);
       setSelectedAnalysis(response.data);
       setIsModalOpen(true);

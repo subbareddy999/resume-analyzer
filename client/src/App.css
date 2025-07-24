@@ -1,11 +1,10 @@
-/* client/src/App.css */
 .app {
     width: 100%;
   }
 
   .tabs {
     margin-bottom: 2rem;
-    border-bottom: 2px solid #444;
+    border-bottom: 2px solid #233554;
     padding-bottom: 0.5rem;
   }
 
@@ -14,34 +13,31 @@
     border: none;
     font-size: 1.2rem;
     padding: 0.5rem 1rem;
-    color: #888;
+    color: #8892b0;
+    font-weight: 500;
+    cursor: pointer;
   }
 
   .tabs button.active {
-    color: #646cff;
-    border-bottom: 2px solid #646cff;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
   }
 
   .card {
-    background-color: #2f2f2f;
+    background-color: var(--card-background);
     border-radius: 8px;
     padding: 1.5rem;
     margin-top: 1rem;
     text-align: left;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #233554;
   }
 
   .card h3 {
     margin-top: 0;
-    color: #646cff;
-    border-bottom: 1px solid #444;
+    color: var(--primary-color);
+    border-bottom: 1px solid #233554;
     padding-bottom: 0.5rem;
-  }
-
-  .upload-box {
-    border: 2px dashed #444;
-    padding: 2rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
   }
 
   .results-grid {
@@ -55,9 +51,24 @@
     grid-column: 1 / -1;
   }
 
-  .error-message {
-    color: #ff6b6b;
-    background-color: #4d2323;
-    padding: 1rem;
+  .dropzone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    border-width: 2px;
     border-radius: 8px;
+    border-color: #233554;
+    border-style: dashed;
+    background-color: #0a192f;
+    color: #8892b0;
+    outline: none;
+    transition: border .24s ease-in-out;
+    cursor: pointer;
+    margin-bottom: 1rem;
+  }
+
+  .dropzone:hover {
+    border-color: var(--primary-color);
   }

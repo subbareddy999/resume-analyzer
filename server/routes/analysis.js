@@ -124,5 +124,24 @@ router.get('/analyses/:id', async (req, res) => {
     }
 });
 
+router.get('/setup-database', async (req, res) => {
+    try {
+        const sql = `
+            CREATE TABLE analyses (
+                id SERIAL PRIMARY KEY,
+                file_name VARCHAR(255) NOT NULL,
+                name VARCHAR(255),
+                email VARCHAR(255),
+                analysis_data JSONB,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+        `;
+        await pool.query(sql);
+        res.status(200).send('✅ Table created successfully!');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('❌ Error creating table or table already exists.');
+    }
+});
 
 module.exports = router;

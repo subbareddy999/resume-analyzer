@@ -4,7 +4,6 @@ const pdf = require('pdf-parse');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const router = express.Router();
 
-// --- DATABASE CONFIGURATION (using PostgreSQL 'pg' library) ---
 const { Pool } = require('pg');
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -13,15 +12,12 @@ const pool = new Pool({
     }
 });
 
-// --- MULTER SETUP ---
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// --- GEMINI API SETUP ---
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
-// --- THE PROMPT ---
 const prompt = `
 You are an expert resume analyzer. Analyze the provided resume text and extract the following information in a structured JSON format.
 
@@ -39,7 +35,6 @@ Do not include any introductory text like "Here is the JSON output". Only output
 The resume text to analyze is below:
 `;
 
-// --- API ENDPOINT: POST /api/analyze ---
 router.post('/analyze', upload.single('resume'), async (req, res) => {
     try {
         if (!req.file) {
@@ -56,7 +51,6 @@ router.post('/analyze', upload.single('resume'), async (req, res) => {
 
         const analysisJSON = JSON.parse(analysisText);
 
-        // --- UPDATED DATABASE LOGIC (PostgreSQL) ---
         const sql = `
             INSERT INTO analyses (file_name, name, email, analysis_data)
             VALUES ($1, $2, $3, $4)
@@ -65,10 +59,9 @@ router.post('/analyze', upload.single('resume'), async (req, res) => {
             req.file.originalname,
             analysisJSON.personalDetails.name || 'N/A',
             analysisJSON.personalDetails.email || 'N/A',
-            analysisJSON // The 'pg' driver handles JSON objects automatically
+            analysisJSON
         ];
         await pool.query(sql, values);
-        // Note: No need for connection.end(), the pool manages connections.
 
         console.log('✅ Analysis complete and saved to database.');
         res.status(200).json(analysisJSON);
@@ -84,10 +77,8 @@ router.post('/analyze', upload.single('resume'), async (req, res) => {
 });
 
 
-// --- ENDPOINT: GET /api/analyses ---
 router.get('/analyses', async (req, res) => {
     try {
-        // --- UPDATED DATABASE LOGIC (PostgreSQL) ---
         const sql = `
             SELECT id, file_name, name, email, created_at
             FROM analyses
@@ -102,18 +93,14 @@ router.get('/analyses', async (req, res) => {
     }
 });
 
-
-// --- ENDPOINT: GET /api/analyses/:id ---
 router.get('/analyses/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
-        // --- UPDATED DATABASE LOGIC (PostgreSQL) ---
         const sql = `SELECT analysis_data FROM analyses WHERE id = $1`;
         const { rows } = await pool.query(sql, [id]);
 
         if (rows.length > 0) {
-            // The analysis_data column is already a JSON object.
             res.status(200).json(rows[0].analysis_data);
         } else {
             res.status(404).json({ error: 'Analysis not found.' });

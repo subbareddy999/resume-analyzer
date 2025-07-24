@@ -31,7 +31,9 @@ const AnalysisPage = () => {
     formData.append('resume', selectedFile);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/analyze', formData, {
+      // --- CORRECTED LINE ---
+      // Use backticks (`) instead of single quotes (') to correctly insert the environment variable.
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/analyze`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

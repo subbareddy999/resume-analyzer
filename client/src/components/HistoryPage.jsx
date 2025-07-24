@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import DetailsModal from '../components/DetailsModal';
-import './HistoryPage.css'; // We will create this CSS file next
+import './HistoryPage.css';
 
 const HistoryPage = () => {
   const [analyses, setAnalyses] = useState([]);
@@ -15,7 +15,8 @@ const HistoryPage = () => {
     const fetchAnalyses = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/analyses');
+        // --- CORRECTED LINE ---
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/analyses`);
         setAnalyses(response.data);
       } catch (err) {
         setError('Failed to fetch analysis history.');
@@ -29,7 +30,8 @@ const HistoryPage = () => {
   // Handle clicking the "Details" button
   const handleDetailsClick = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/analyses/${id}`);
+      // --- CORRECTED LINE ---
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/analyses/${id}`);
       setSelectedAnalysis(response.data);
       setIsModalOpen(true);
     } catch (err) {

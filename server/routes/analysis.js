@@ -19,20 +19,67 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
 const prompt = `
-You are an expert resume analyzer. Analyze the provided resume text and extract the following information in a structured JSON format.
+You are a highly experienced technical recruiter and career coach with expertise in software engineering resumes. Your task is to meticulously analyze the provided resume text and convert it into a structured JSON object.
 
-The JSON object must have these exact keys: "personalDetails", "resumeContent", "skills", "aiFeedback".
+The output MUST be a single, raw JSON object, without any surrounding text, explanations, or markdown formatting like \`\`\`json.
 
-1.  "personalDetails": Extract the person's name, email, phone number, and any LinkedIn or portfolio URLs.
-2.  "resumeContent": Extract the summary/objective, all work experience (with company, role, dates, and description), education (with institution, degree, and dates), projects, and any certifications.
-3.  "skills": Identify and categorize skills into "technicalSkills" and "softSkills". List them as arrays of strings.
-4.  "aiFeedback": Provide AI-driven feedback. This must include:
-    * "rating": An overall resume rating on a scale of 1 to 10.
-    * "improvementAreas": A summary of specific areas for improvement.
-    * "upskillingSuggestions": A list of 3-5 suggested skills to learn, relevant to the user's profile.
+The JSON object must strictly adhere to the following structure. Do not add or remove any keys. If a piece of information is not found, use an empty string "" for string values, an empty array [] for array values, or null where appropriate.
 
-Do not include any introductory text like "Here is the JSON output". Only output the raw JSON object.
-The resume text to analyze is below:
+{
+  "personalDetails": {
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "linkedin": "string | null",
+    "portfolio": "string | null"
+  },
+  "resumeContent": {
+    "summary": "string",
+    "workExperience": [
+      {
+        "role": "string",
+        "company": "string",
+        "dates": "string (e.g., 'Jan 2022 - Present')",
+        "description": [
+          "string (each bullet point or responsibility as a separate string)"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "institution": "string",
+        "degree": "string",
+        "dates": "string"
+      }
+    ],
+    "projects": [
+      {
+        "name": "string",
+        "description": "string"
+      }
+    ],
+    "certifications": [
+      "string"
+    ]
+  },
+  "skills": {
+    "technicalSkills": [
+      "string"
+    ],
+    "softSkills": [
+      "string"
+    ]
+  },
+  "aiFeedback": {
+    "rating": "number (an integer score from 1 to 10 based on overall quality)",
+    "improvementAreas": "string (a concise paragraph with specific, actionable advice on what to improve)",
+    "upskillingSuggestions": [
+      "string (a list of 3-5 modern, relevant skills for the candidate to learn, considering the current 2025 job market)"
+    ]
+  }
+}
+
+Now, analyze the following resume text and provide the JSON output:
 `;
 
 router.post('/analyze', upload.single('resume'), async (req, res) => {

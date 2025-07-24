@@ -2,17 +2,16 @@ const express = require('express');
 const multer = require('multer');
 const pdf = require('pdf-parse');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const mysql = require('mysql2/promise');
-
 const router = express.Router();
 
-// --- DATABASE CONFIGURATION ---
-const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-};
+// --- DATABASE CONFIGURATION (using PostgreSQL 'pg' library) ---
+const { Pool } = require('pg');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 
 // --- MULTER SETUP ---
 const storage = multer.memoryStorage();
@@ -41,7 +40,6 @@ The resume text to analyze is below:
 `;
 
 // --- API ENDPOINT: POST /api/analyze ---
-// (This is your existing endpoint from Step 3, no changes needed here)
 router.post('/analyze', upload.single('resume'), async (req, res) => {
     try {
         if (!req.file) {
@@ -58,18 +56,19 @@ router.post('/analyze', upload.single('resume'), async (req, res) => {
 
         const analysisJSON = JSON.parse(analysisText);
 
-        const connection = await mysql.createConnection(dbConfig);
+        // --- UPDATED DATABASE LOGIC (PostgreSQL) ---
         const sql = `
             INSERT INTO analyses (file_name, name, email, analysis_data)
-            VALUES (?, ?, ?, ?)
+            VALUES ($1, $2, $3, $4)
         `;
-        await connection.execute(sql, [
+        const values = [
             req.file.originalname,
             analysisJSON.personalDetails.name || 'N/A',
             analysisJSON.personalDetails.email || 'N/A',
-            JSON.stringify(analysisJSON)
-        ]);
-        await connection.end();
+            analysisJSON // The 'pg' driver handles JSON objects automatically
+        ];
+        await pool.query(sql, values);
+        // Note: No need for connection.end(), the pool manages connections.
 
         console.log('✅ Analysis complete and saved to database.');
         res.status(200).json(analysisJSON);
@@ -85,20 +84,18 @@ router.post('/analyze', upload.single('resume'), async (req, res) => {
 });
 
 
-// --- NEW ENDPOINT: GET /api/analyses ---
-// Fetches a list of all past analyses for the history table.
+// --- ENDPOINT: GET /api/analyses ---
 router.get('/analyses', async (req, res) => {
     try {
-        const connection = await mysql.createConnection(dbConfig);
+        // --- UPDATED DATABASE LOGIC (PostgreSQL) ---
         const sql = `
             SELECT id, file_name, name, email, created_at
             FROM analyses
             ORDER BY created_at DESC
         `;
-        const [rows] = await connection.execute(sql);
-        await connection.end();
-
+        const { rows } = await pool.query(sql);
         res.status(200).json(rows);
+
     } catch (error) {
         console.error('❌ Error fetching analysis history:', error);
         res.status(500).json({ error: 'Failed to fetch analysis history.' });
@@ -106,19 +103,17 @@ router.get('/analyses', async (req, res) => {
 });
 
 
-// --- NEW ENDPOINT: GET /api/analyses/:id ---
-// Fetches the full details of a single analysis for the modal view.
+// --- ENDPOINT: GET /api/analyses/:id ---
 router.get('/analyses/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const connection = await mysql.createConnection(dbConfig);
-        const sql = `SELECT analysis_data FROM analyses WHERE id = ?`;
-        const [rows] = await connection.execute(sql, [id]);
-        await connection.end();
+
+        // --- UPDATED DATABASE LOGIC (PostgreSQL) ---
+        const sql = `SELECT analysis_data FROM analyses WHERE id = $1`;
+        const { rows } = await pool.query(sql, [id]);
 
         if (rows.length > 0) {
-            // The analysis_data column is already a JSON string in the DB.
-            // We parse it before sending it to the client.
+            // The analysis_data column is already a JSON object.
             res.status(200).json(rows[0].analysis_data);
         } else {
             res.status(404).json({ error: 'Analysis not found.' });

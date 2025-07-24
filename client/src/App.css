@@ -1,0 +1,63 @@
+/* client/src/App.css */
+.app {
+    width: 100%;
+  }
+
+  .tabs {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #444;
+    padding-bottom: 0.5rem;
+  }
+
+  .tabs button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    color: #888;
+  }
+
+  .tabs button.active {
+    color: #646cff;
+    border-bottom: 2px solid #646cff;
+  }
+
+  .card {
+    background-color: #2f2f2f;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    text-align: left;
+  }
+
+  .card h3 {
+    margin-top: 0;
+    color: #646cff;
+    border-bottom: 1px solid #444;
+    padding-bottom: 0.5rem;
+  }
+
+  .upload-box {
+    border: 2px dashed #444;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+
+  .error-message {
+    color: #ff6b6b;
+    background-color: #4d2323;
+    padding: 1rem;
+    border-radius: 8px;
+  }

@@ -1,35 +1,22 @@
-import { useState } from 'react';
-import { Toaster } from 'react-hot-toast';
-import './App.css';
-import AnalysisPage from './components/AnalysisPage';
-import HistoryPage from './components/HistoryPage';
+import { Toaster as HotToaster } from 'react-hot-toast'; // We'll use the toast library we already have
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 
 function App() {
-  const [activeTab, setActiveTab] = useState('live');
-
   return (
-    <div className="app">
-      <Toaster position="top-center" reverseOrder={false} />
-      <nav className="tabs">
-        <button
-          className={activeTab === 'live' ? 'active' : ''}
-          onClick={() => setActiveTab('live')}
-        >
-          Live Resume Analysis
-        </button>
-        <button
-          className={activeTab === 'history' ? 'active' : ''}
-          onClick={() => setActiveTab('history')}
-        >
-          Historical Viewer
-        </button>
-      </nav>
+    <>
+      {/* This component handles the pop-up notifications */}
+      <HotToaster position="top-center" reverseOrder={false} />
 
-      <main>
-        {activeTab === 'live' && <AnalysisPage />}
-        {activeTab === 'history' && <HistoryPage />}
-      </main>
-    </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          {/* This is a catch-all route for any page that doesn't exist */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 

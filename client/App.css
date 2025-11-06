@@ -1,0 +1,8 @@
+.pdf-export-active #export-card {
+    display: none !important;
+  }
+
+  .pdf-export-active * {
+    transition: none !important;
+    animation: none !important;
+  }
